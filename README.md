@@ -1,1 +1,2 @@
-# authmgr
+# User Management API
+
