@@ -13,7 +13,13 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
+boto3 = {version = "^1.26.54", optional = true}
 
+[tool.poetry.extras]
+cognito = ["boto3"]
+
+[tool.poetry.group.dev.dependencies]
+python-dotenv = {extras = ["cli"], version = "^0.21.1"}
 
 [build-system]
 requires = ["poetry-core"]

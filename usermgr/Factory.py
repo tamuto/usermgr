@@ -1,9 +1,14 @@
-from .cognito import CognitoUserMgr
+import importlib
 
-AWS_COGNITO = 'cognito-idp'
+AWS_COGNITO = 'cognito'
+
+singleton = None
 
 
 def get_instance(provider, **kwargs):
-    if provider == AWS_COGNITO:
-        return CognitoUserMgr(**kwargs)
-    raise Exception(f'Unknown Provider: {provider}')
+    global singleton
+    if singleton != None:
+        return singleton
+    module = importlib.import_module(f'.{provider}', 'usermgr.providers')
+    singleton = module.new_instance(**kwargs)
+    return singleton
