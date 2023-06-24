@@ -29,11 +29,18 @@ class TestCognito(unittest.TestCase):
     def test_user(self):
         if self.mgr.is_exist_user('test'):
             self.mgr.delete_user('test')
-        self.mgr.add_user('test', 'labo$test%123', 'test@infodb.jp')
+        attrs = {
+            'email': 'test@infodb.jp',
+            'email_verified': 'true',
+            'custom:facility_code': 'abc123'
+        }
+        self.mgr.add_user('test', 'labo$test%123', attrs)
         self.mgr.add_user_to_group('test', 'testgroup')
-        
-        data = self.mgr.list_users('testgroup')
-        print(data)
+
+        attrs['custom:facility_code'] = 'updated'
+        self.mgr.update_user('test', attrs)
+
+        self.mgr.set_password('test', 'labo$test%456', True)
 
     def test_add_group(self):
         # self.mgr.delete_group('testgroup')

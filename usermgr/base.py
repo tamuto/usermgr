@@ -9,7 +9,15 @@ class UserManager(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def add_user(self, username, password, **kwargs):
+    def add_user(self, username, password, attrs):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def update_user(self, username, attrs):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def set_password(self, username, password, permanent=False):
         raise NotImplementedError()
 
     @abstractmethod
@@ -27,11 +35,7 @@ class UserManager(metaclass=ABCMeta):
     @abstractmethod
     def add_group(self, groupname):
         raise NotImplementedError()
-    
-    @abstractmethod
-    def delete_group(self, groupname):
-        raise NotImplementedError()
 
     @abstractmethod
-    def list_users(self, groupname):
+    def delete_group(self, groupname):
         raise NotImplementedError()

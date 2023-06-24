@@ -29,25 +29,14 @@ class CognitoUserMgr(UserManager):
             bytes(username + self.client_id, 'utf-8'),
             digestmod=hashlib.sha256).digest()).decode()
 
-    def add_user(self, username, password, email, **kwargs):
-        # TODO ユーザ属性をどのように設定するか？
+    def add_user(self, username, password, attrs):
         response = self.idp.admin_create_user(
             UserPoolId=self.user_pool_id,
             Username=username,
             TemporaryPassword=password,
-            UserAttributes=[
-                {
-                    "Name": "email",
-                    "Value": email
-                },
-                {
-                    "Name": "email_verified",
-                    "Value": "true"
-                }
-            ],
+            UserAttributes=[{ "Name": k, "Value": v } for k, v in attrs.items()],
             MessageAction="SUPPRESS"
         )
-        print(response)
 
         response = self.idp.admin_initiate_auth(
             UserPoolId=self.user_pool_id,
@@ -59,8 +48,6 @@ class CognitoUserMgr(UserManager):
                 'SECRET_HASH': self._make_hash(username)
             }
         )
-
-        print(response)
 
         session = response['Session']
 
@@ -75,22 +62,34 @@ class CognitoUserMgr(UserManager):
             },
             Session=session
         )
-        print(response)
+
+    def update_user(self, username, attrs):
+        self.idp.admin_update_user_attributes(
+            UserPoolId=self.user_pool_id,
+            Username=username,
+            UserAttributes=[{ "Name": k, "Value": v } for k, v in attrs.items()],
+        )
+
+    def set_password(self, username, password, permanent=False):
+        self.idp.admin_set_user_password(
+            UserPoolId=self.user_pool_id,
+            Username=username,
+            Password=password,
+            Permanent=permanent
+        )
 
     def delete_user(self, username):
-        response = self.idp.admin_delete_user(
+        self.idp.admin_delete_user(
             UserPoolId=self.user_pool_id,
             Username=username
         )
-        print(response)
 
     def is_exist_user(self, username):
         try:
-            response = self.idp.admin_get_user(
+            self.idp.admin_get_user(
                 UserPoolId=self.user_pool_id,
                 Username=username
             )
-            print(response)
             return True
         except ClientError as e:
             if e.response['Error']['Code'] == 'UserNotFoundException':
@@ -115,13 +114,4 @@ class CognitoUserMgr(UserManager):
         self.idp.delete_group(
             UserPoolId=self.user_pool_id,
             GroupName=groupname
-        )
-
-    def list_users(self, groupname, limit=60, nexttoken=''):
-        # TODO Paging対応する。
-        return self.idp.list_users_in_group(
-            UserPoolId=self.user_pool_id,
-            GroupName=groupname,
-            Limit=limit,
-            # NextToken=nexttoken
         )

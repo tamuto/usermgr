@@ -7,13 +7,14 @@
   * prepare .env file
 
 ```
-AWS_ACCESS_KEY_ID=xxx
-AWS_SECRET_ACCESS_KEY=xxx
+AWS_ACCESS_KEY_ID=***
+AWS_SECRET_ACCESS_KEY=***
 or
-AWS_PROFILE=xxx
+AWS_PROFILE=***
 
-USER_POOL_ID=xxx
-CLIENT_ID=xxx
+USER_POOL_ID=***
+CLIENT_ID=***
+CLIENT_SECRET=***
 ```
 
   * run unittest
