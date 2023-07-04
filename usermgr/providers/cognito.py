@@ -37,6 +37,7 @@ class CognitoUserMgr(UserManager):
             UserAttributes=[{ "Name": k, "Value": v } for k, v in attrs.items()],
             MessageAction="SUPPRESS"
         )
+        sub_id = [d['Value'] for d in response['User']['Attributes'] if d['Name'] == 'sub'][0]
 
         response = self.idp.admin_initiate_auth(
             UserPoolId=self.user_pool_id,
@@ -62,6 +63,7 @@ class CognitoUserMgr(UserManager):
             },
             Session=session
         )
+        return sub_id
 
     def update_user(self, username, attrs):
         self.idp.admin_update_user_attributes(

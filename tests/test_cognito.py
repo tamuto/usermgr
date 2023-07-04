@@ -34,13 +34,15 @@ class TestCognito(unittest.TestCase):
             'email_verified': 'true',
             'custom:facility_code': 'abc123'
         }
-        self.mgr.add_user('test', 'labo$test%123', attrs)
+        sub_id = self.mgr.add_user('test', 'labo$test%123', attrs)
         self.mgr.add_user_to_group('test', 'testgroup')
 
         attrs['custom:facility_code'] = 'updated'
         self.mgr.update_user('test', attrs)
 
         self.mgr.set_password('test', 'labo$test%456', True)
+
+        print(sub_id)
 
     def test_add_group(self):
         # self.mgr.delete_group('testgroup')
