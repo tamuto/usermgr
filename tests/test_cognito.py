@@ -11,11 +11,13 @@ class TestCognito(unittest.TestCase):
             Factory.singleton.close()
         Factory.singleton = None
 
+        region = os.environ.get('REGION')
         user_pool_id = os.environ.get('USER_POOL_ID')
         client_id = os.environ.get('CLIENT_ID')
         client_secret = os.environ.get('CLIENT_SECRET')
         self.mgr = Factory.get_instance(
             Factory.AWS_COGNITO,
+            region=region,
             user_pool_id=user_pool_id,
             client_id=client_id,
             client_secret=client_secret
@@ -32,12 +34,12 @@ class TestCognito(unittest.TestCase):
         attrs = {
             'email': 'test@infodb.jp',
             'email_verified': 'true',
-            'custom:facility_code': 'abc123'
+            # 'custom:facility_code': 'abc123'
         }
         sub_id = self.mgr.add_user('test', 'labo$test%123', attrs)
         self.mgr.add_user_to_group('test', 'testgroup')
 
-        attrs['custom:facility_code'] = 'updated'
+        # attrs['custom:facility_code'] = 'updated'
         self.mgr.update_user('test', attrs)
 
         self.mgr.set_password('test', 'labo$test%456', True)
