@@ -14,8 +14,8 @@ def new_instance(**kwargs):
 
 class CognitoUserMgr(UserManager):
 
-    def __init__(self, user_pool_id, client_id, client_secret, **kwargs):
-        self.idp = boto3.client('cognito-idp')
+    def __init__(self, region, user_pool_id, client_id, client_secret, **kwargs):
+        self.idp = boto3.client('cognito-idp', region_name=region)
         self.user_pool_id = user_pool_id
         self.client_id = client_id
         self.client_secret = client_secret
