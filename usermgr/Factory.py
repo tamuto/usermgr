@@ -1,6 +1,7 @@
 import importlib
 
 AWS_COGNITO = 'cognito'
+AWS_LAMBDA = 'lambda'
 
 singleton = None
 

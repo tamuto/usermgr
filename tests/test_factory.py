@@ -4,6 +4,7 @@ import os
 from usermgr import Factory
 
 
+@unittest.skip('環境設定依存のため')
 class TestFactory(unittest.TestCase):
 
     def setUp(self):

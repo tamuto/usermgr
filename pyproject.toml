@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "usermgr"
-version = "0.1.2"
+version = "0.2.0"
 description = ""
 authors = ["tamuto <tamuto@infodb.jp>"]
 readme = "README.md"
@@ -17,6 +17,7 @@ boto3 = {version = "^1.26.54", optional = true}
 
 [tool.poetry.extras]
 cognito = ["boto3"]
+lambda = ["boto3"]
 
 [tool.poetry.group.dev.dependencies]
 python-dotenv = {extras = ["cli"], version = "^0.21.1"}
