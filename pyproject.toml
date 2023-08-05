@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "usermgr"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = ["tamuto <tamuto@infodb.jp>"]
 readme = "README.md"
