@@ -7,7 +7,7 @@ from usermgr import Factory
 class TestLambda(unittest.TestCase):
 
     def setUp(self):
-        if Factory.singleton != None:
+        if Factory.singleton is not None:
             Factory.singleton.close()
         Factory.singleton = None
 
@@ -16,7 +16,7 @@ class TestLambda(unittest.TestCase):
         )
 
     def tearDown(self):
-        if Factory.singleton != None:
+        if Factory.singleton is not None:
             Factory.singleton.close()
         Factory.singleton = None
 

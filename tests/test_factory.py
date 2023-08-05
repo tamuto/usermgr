@@ -8,13 +8,13 @@ from usermgr import Factory
 class TestFactory(unittest.TestCase):
 
     def setUp(self):
-        if Factory.singleton != None:
+        if Factory.singleton is not None:
             Factory.singleton.close()
         Factory.singleton = None
 
     def test_get_instance_except(self):
         with self.assertRaises(ModuleNotFoundError):
-            instance = Factory.get_instance('UnkownProvider')
+            Factory.get_instance('UnkownProvider')
 
     def test_get_instance_cognito(self):
         region = os.environ.get('REGION')

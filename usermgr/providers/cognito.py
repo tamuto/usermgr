@@ -34,7 +34,7 @@ class CognitoUserMgr(UserManager):
             UserPoolId=self.user_pool_id,
             Username=username,
             TemporaryPassword=password,
-            UserAttributes=[{ "Name": k, "Value": v } for k, v in attrs.items()],
+            UserAttributes=[{"Name": k, "Value": v} for k, v in attrs.items()],
             MessageAction="SUPPRESS"
         )
         sub_id = [d['Value'] for d in response['User']['Attributes'] if d['Name'] == 'sub'][0]
@@ -69,7 +69,7 @@ class CognitoUserMgr(UserManager):
         self.idp.admin_update_user_attributes(
             UserPoolId=self.user_pool_id,
             Username=username,
-            UserAttributes=[{ "Name": k, "Value": v } for k, v in attrs.items()],
+            UserAttributes=[{"Name": k, "Value": v} for k, v in attrs.items()],
         )
 
     def set_password(self, username, password, permanent=False):

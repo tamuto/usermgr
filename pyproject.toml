@@ -21,6 +21,7 @@ lambda = ["boto3"]
 
 [tool.poetry.group.dev.dependencies]
 python-dotenv = {extras = ["cli"], version = "^0.21.1"}
+flake8 = "^6.1.0"
 
 [build-system]
 requires = ["poetry-core"]

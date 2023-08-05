@@ -71,7 +71,7 @@ def add_user(username, password, attrs):
         UserPoolId=user_pool_id,
         Username=username,
         TemporaryPassword=password,
-        UserAttributes=[{ "Name": k, "Value": v } for k, v in attrs.items()],
+        UserAttributes=[{"Name": k, "Value": v} for k, v in attrs.items()],
         MessageAction="SUPPRESS"
     )
     sub_id = [d['Value'] for d in response['User']['Attributes'] if d['Name'] == 'sub'][0]
@@ -107,7 +107,7 @@ def update_user(username, attrs):
     idp.admin_update_user_attributes(
         UserPoolId=user_pool_id,
         Username=username,
-        UserAttributes=[{ "Name": k, "Value": v } for k, v in attrs.items()],
+        UserAttributes=[{"Name": k, "Value": v} for k, v in attrs.items()],
     )
 
 
