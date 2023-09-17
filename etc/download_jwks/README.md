@@ -10,6 +10,8 @@ AWS_REGION=***
 
 ACCOUNT_ID=123456789012
 ROLE=usermgr-lambda-role
+
+USERPOOL_ID=ap-northeast-1_***
 ```
 
 ### ラムダの作成
