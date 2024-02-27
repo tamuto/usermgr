@@ -2,8 +2,6 @@
 
 ## Overview
 
-TODO: README_ja.mdを英訳する
-
 This is a library and tools for user management.
 It provides the following functions.
 
