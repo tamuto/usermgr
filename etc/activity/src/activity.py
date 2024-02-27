@@ -16,4 +16,11 @@ def handler(event, context):
             'updated_at': datetime.datetime.now(jst).isoformat(),
         }
     )
+    event['response'] = {
+        'claimsOverrideDetails': {
+            'claimsToAddOrOverride': {
+                'custom:updated_at': datetime.datetime.now(jst).isoformat(),
+            }
+        }
+    }
     return event
