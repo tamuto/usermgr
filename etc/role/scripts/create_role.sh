@@ -34,9 +34,9 @@ JSON=$(cat << EOS
         "dynamodb:DeleteItem",
         "dynamodb:Scan",
         "dynamodb:Query",
-        "dynamodb:BatchWrite"
+        "dynamodb:BatchWriteItem"
       ],
-      "Resource": "arn:aws:dynamodb:$AWS_REGION:$ACCOUNT_ID:table/usermgr_activity"
+      "Resource": "arn:aws:dynamodb:$AWS_REGION:$ACCOUNT_ID:table/$DYNAMODB_NAME"
     }
   ]
 }
