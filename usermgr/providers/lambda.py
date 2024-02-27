@@ -12,13 +12,14 @@ class LambdaUserMgr(UserManager):
 
     def __init__(self, **kwargs):
         self.client = boto3.client('lambda')
+        self.function_name = kwargs['function_name'] if 'name' in kwargs else 'usermgr'
 
     def close(self):
         pass
 
     def _invoke(self, payload):
         result = self.client.invoke(
-            FunctionName='usermgr',
+            FunctionName=self.function_name,
             LogType='Tail',
             Payload=json.dumps(payload).encode('utf-8')
         )
