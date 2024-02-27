@@ -12,7 +12,7 @@ class LambdaUserMgr(UserManager):
 
     def __init__(self, **kwargs):
         self.client = boto3.client('lambda')
-        self.function_name = kwargs['function_name'] if 'name' in kwargs else 'usermgr'
+        self.function_name = kwargs['function_name'] if 'function_name' in kwargs else 'usermgr'
 
     def close(self):
         pass
