@@ -68,9 +68,6 @@ instance.add_user('username', 'password', {
 | AWS_REGION               | AWSのリージョン                            |
 | ACCOUNT_ID               | AWSのアカウントID                          |
 | ROLE                     | ラムダ関数に付与するIAMロール名            |
-| DYNAMODB_ACTIVITY_POLICY | ロールに付与するDynamoDBアクセスポリシー名 |
-| DYNAMODB_NAME            | DynamoDBのテーブル名                       |
-| LAMBDA_NAME_ACTIVITY     | ユーザアクティビティ管理用Lambda関数名     |
 | LAMBDA_NAME_USERMGR      | ユーザ管理用Lambda関数名                   |
 | LAMBDA_NAME_DOWNLOAD     | JWKSダウンロード用Lambda関数名             |
 | USERPOOL_ID              | CognitoのユーザプールID                    |
@@ -85,9 +82,6 @@ AWS_REGION=ap-northeast-1
 
 ACCOUNT_ID=xxxxxx
 ROLE=usermgr-lambda-role
-DYNAMODB_ACTIVITY_POLICY=usermgr_activity_policy
-DYNAMODB_NAME=usermgr_activity
-LAMBDA_NAME_ACTIVITY=usermgr_activity
 LAMBDA_NAME_USERMGR=usermgr
 LAMBDA_NAME_DOWNLOAD=usermgr_download_jwks
 
@@ -125,17 +119,6 @@ dotenv run ./download_jwks/scripts/create_function.sh
 
 - ./download_jwks/scripts/execute_function.shを参考に各プロジェクトにLambda実行を組み込んでください。
 
-##### 3-3. Cognitoユーザアクティビティ管理用Lambda関数の作成
-
-- 以下のスクリプトを実行してください。
-
-```bash
-dotenv run ./activity/scripts/create_dynamodb.sh
-dotenv run ./activity/scripts/create_function.sh
-```
-
-- CognitoのLambdaトリガーでトークン生成前LambdaトリガーとしてLambda関数を登録してください。
-
 ## 削除方法
 
 - 以下のコマンドを実行してください。
@@ -145,8 +128,5 @@ dotenv run ./activity/scripts/create_function.sh
 ```bash
 dotenv run aws lambda delete-function --function-name usermgr
 dotenv run aws lambda delete-function --function-name usermgr_dl_jwks
-dotenv run aws lambda delete-function --function-name usermgr_activity
-dotenv run aws dynamodb delete-table --table-name usermgr_activity
 dotenv run aws iam delete-role --role-name usermgr-lambda-role
-dotenv run aws iam delete-policy --policy-name usermgr_activity_policy
 ```

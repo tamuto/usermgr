@@ -68,9 +68,6 @@ instance.add_user('username', 'password', {
 | AWS_REGION | Region name |
 | ACCOUNT_ID | AWS account ID |
 | ROLE | IAM role name to be granted to the Lambda function |
-| DYNAMODB_ACTIVITY_POLICY | DynamoDB access policy name to be granted to the role |
-| DYNAMODB_NAME | DynamoDB table name |
-| LAMBDA_NAME_ACTIVITY| Lambda function name for user activity management |
 | LAMBDA_NAME_USERMGR| Lambda function name for user management |
 | LAMBDA_NAME_DOWNLOAD| Lambda function name for JWKS download |
 | USERPOOL_ID | Cognito user pool ID |
@@ -85,9 +82,6 @@ AWS_REGION=ap-northeast-1
 
 ACCOUNT_ID=xxxxxx
 ROLE=usermgr-lambda-role
-DYNAMODB_ACTIVITY_POLICY=usermgr_activity_policy
-DYNAMODB_NAME=usermgr_activity
-LAMBDA_NAME_ACTIVITY=usermgr_activity
 LAMBDA_NAME_USERMGR=usermgr
 LAMBDA_NAME_DOWNLOAD=usermgr_download_jwks
 
@@ -125,17 +119,6 @@ dotenv run ./download_jwks/scripts/create_function.sh
 
 - Please incorporate Lambda execution into each project by referring to ./download_jwks/scripts/create_function.sh.
 
-##### 3-3. Create a Lambda function for user activity management
-
-- execute the following command in the etc folder.
-
-```bash
-dotenv run ./activity/scripts/create_dynamodb.sh
-dotenv run ./activity/scripts/create_function.sh
-```
-
-- Please regist the Lambda function with PreCreate Token Lambda Trigger in Cognito User Pool.
-
 ## How To Remove the User Management Tools & Library
 
 - Follow the steps below after moving to the etc folder.
@@ -145,8 +128,5 @@ dotenv run ./activity/scripts/create_function.sh
 ```bash
 dotenv run aws lambda delete-function --function-name usermgr
 dotenv run aws lambda delete-function --function-name usermgr_dl_jwks
-dotenv run aws lambda delete-function --function-name usermgr_activity
-dotenv run aws dynamodb delete-table --table-name usermgr_activity
 dotenv run aws iam delete-role --role-name usermgr-lambda-role
-dotenv run aws iam delete-policy --policy-name usermgr_activity_policy
 ```
