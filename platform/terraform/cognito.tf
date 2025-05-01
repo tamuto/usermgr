@@ -19,7 +19,7 @@ resource "aws_cognito_user_pool" "user_pool" {
     user_pool_tier = "ESSENTIALS"
 
     # 誤ったユーザプール削除を禁止
-    deletion_protection = "ACTIVE"
+    # deletion_protection = "ACTIVE"
 
     admin_create_user_config {
         # アプリケーション経由でのユーザー登録を許可
