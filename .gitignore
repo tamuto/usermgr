@@ -1,4 +1,5 @@
 .terraform
+terraform.tfstate.backup
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
