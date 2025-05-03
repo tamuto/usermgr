@@ -98,11 +98,11 @@ instance.delete_group('groupname')
 ### Cognitoユーザ管理用Lambda関数
 
 - プライベートサブネットからLambda関数経由でCognitoを操作する場合に利用します。
-- `etc` フォルダへ移動後に、以下の手順に従って登録を行ってください。
+- `platform/etc` フォルダへ移動後に、以下の手順に従って登録を行ってください。
 
 #### 1. 環境設定ファイルの作成
 
-- `etc/.env` ファイルを作成してください。
+- `platform/etc/.env` ファイルを作成してください。
 - 各設定値は以下の通りです：
   - AWS_ACCESS_KEY_ID、AWS_SECRET_ACCESS_KEYおよびAWS_PROFILEは、aws cliのコンフィグファイルに合わせて設定してください。
 
