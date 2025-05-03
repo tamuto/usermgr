@@ -3,33 +3,34 @@
 ## Overview
 
 This is a library and tools for user management.
-It provides the following functions.
+It provides the following functions:
 
-- usermgr library for Python
-- Lambda functions for Cognito user management
-- DynamoDB definition and Lambda functions for Cognito user activity management
-- [Under construction] GUI tool for user management
+- Python library (usermgr) for user management
+- Lambda functions for AWS Cognito user management
+- Terraform configurations for AWS Cognito setup
+- Web-based test UI for user management
+- Command-line tools for user management
 
 ## Description of each tool and library
 
 ### usermgr library
 
 - This is a Python library for user management.
-- It provides functions such as adding, updating, deleting, and searching users.
+- It provides functions such as adding, updating, deleting, and searching users, as well as group management.
 - At the moment, it supports AWS Cognito.
 - It supports both direct operation of Cognito API and operation via Lambda function.
   - Use a Lambda function when you cannot directly operate Cognito from a private subnet.
-- In the future, it is planned to support other user management services. The structure of the library will be kept the same so that it can be used when other services are supported.
+- In the future, it is planned to support other user management services. The structure of the library is designed with an abstract base class so that different providers can be implemented with the same interface.
 
 #### Install
 
-- When directly operating Cognito API
+- When directly operating Cognito API:
 
 ```bash
 pip install usermgr[cognito]
 ```
 
-- When operating via Lambda function
+- When operating via Lambda function:
 
 ```bash
 pip install usermgr[lambda]
@@ -40,24 +41,69 @@ pip install usermgr[lambda]
 ```python
 from usermgr import Factory
 
-instance = Factory.create(Factory.AWS_COGNITO)  # For Lambda, use Factory.AWS_LAMBDA
+# For direct Cognito operation
+instance = Factory.create(Factory.AWS_COGNITO, 
+                         region='<AWS_REGION>', 
+                         user_pool_id='<USER_POOL_ID>', 
+                         client_id='<CLIENT_ID>', 
+                         client_secret='<CLIENT_SECRET>')
 
+# For Lambda operation
+instance = Factory.create(Factory.AWS_LAMBDA, 
+                         function_name='<LAMBDA_FUNCTION_NAME>')
+
+# Add a user
 instance.add_user('username', 'password', {
     'custom:extra_info': 'extra_info'
 })
+
+# Update user attributes
+instance.update_user('username', {
+    'custom:extra_info': 'updated_info'
+})
+
+# Set a new password
+instance.set_password('username', 'new_password', permanent=True)
+
+# Delete a user
+instance.delete_user('username')
+
+# Check if a user exists
+if instance.is_exist_user('username'):
+    print('User exists')
+
+# Add a user to a group
+instance.add_user_to_group('username', 'groupname')
+
+# Create a new group
+instance.add_group('groupname', 'description')
+
+# Delete a group
+instance.delete_group('groupname')
 ```
 
-- Please refer to usermgr/base.py for available functions.
+- Please refer to `usermgr/base.py` for all available functions.
 
-### Cognito user management Lambda function
+### Terraform Configuration
+
+The repository includes Terraform configuration files in the `platform/terraform` directory that help you set up AWS Cognito user pools. These configurations provide:
+
+- Cognito User Pool with customizable settings
+- User Pool Client for application integration
+- User Pool Domain for authentication endpoints
+- Managed login branding support
+
+To use these configurations, navigate to the `platform/terraform` directory and customize the variables in `variables.tf` to match your requirements.
+
+### Cognito User Management Lambda Functions
 
 - Used when operating Cognito via Lambda function from a private subnet.
-- Follow the steps below after moving to the etc folder.
+- Follow the steps below after moving to the `etc` folder.
 
 #### 1. Create an environment configuration file
 
-- Create the etc/.env file.
-- The settings are as follows.
+- Create the `etc/.env` file.
+- The settings are as follows:
   - AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_PROFILE should be set according to the aws cli configuration file.
 
 | Name | Description |
@@ -92,32 +138,88 @@ SECRET=xxxxx
 
 #### 2. IAM role creation
 
-- execute the following command in the etc folder.
+- Execute the following command in the etc folder:
 
 ```bash
 dotenv run ./role/scripts/create_role.sh
 ```
 
-#### 3. Register Lambda function
+#### 3. Register Lambda functions
 
 ##### 3-1. Create a Lambda function for user management
 
-- execute the following command in the etc folder.
+- Execute the following command in the etc folder:
 
 ```bash
-dotenv run ./usermgr/scripts/create_usermgr.sh
+dotenv run ./usermgr/scripts/create_function.sh
+```
+
+To update an existing function:
+
+```bash
+dotenv run ./usermgr/scripts/update_function.sh
 ```
 
 ##### 3-2. Create a Lambda function for JWKS download
 
-- execute the following command in the etc folder.
-- this function is needed when using Cognito's ID token validation in the private subnet.
+- Execute the following command in the etc folder:
+- This function is needed when using Cognito's ID token validation in the private subnet.
 
 ```bash
 dotenv run ./download_jwks/scripts/create_function.sh
 ```
 
-- Please incorporate Lambda execution into each project by referring to ./download_jwks/scripts/create_function.sh.
+To update an existing function:
+
+```bash
+dotenv run ./download_jwks/scripts/update_function.sh
+```
+
+To execute the function:
+
+```bash
+dotenv run ./download_jwks/scripts/execute_function.sh
+```
+
+### Web-based Test UI
+
+The repository includes a web-based test UI for user management in the `testui` directory. This UI is built using React and can be used to test user management functions.
+
+Setup:
+
+```bash
+cd testui
+npm install
+```
+
+Start the dev server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+### Command-line Tools
+
+The repository includes command-line tools for user management in the `tools` directory. These tools are built using Bun.
+
+Setup:
+
+```bash
+cd tools
+bun install
+```
+
+Run:
+
+```bash
+bun run index.ts
+```
 
 ## How To Remove the User Management Tools & Library
 
