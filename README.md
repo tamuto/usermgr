@@ -98,11 +98,11 @@ To use these configurations, navigate to the `platform/terraform` directory and 
 ### Cognito User Management Lambda Functions
 
 - Used when operating Cognito via Lambda function from a private subnet.
-- Follow the steps below after moving to the `etc` folder.
+- Follow the steps below after moving to the `platform/etc` folder.
 
 #### 1. Create an environment configuration file
 
-- Create the `etc/.env` file.
+- Create the `platform/etc/.env` file.
 - The settings are as follows:
   - AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_PROFILE should be set according to the aws cli configuration file.
 
