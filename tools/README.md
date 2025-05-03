@@ -1,15 +1,23 @@
-# tools
+# Rspack Project
 
-To install dependencies:
+## Setup
 
-```bash
-bun install
-```
-
-To run:
+Install the dependencies:
 
 ```bash
-bun run index.ts
+npm install
 ```
 
-This project was created using `bun init` in bun v1.0.13. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Get Started
+
+Start the dev server:
+
+```bash
+npm run dev
+```
+
+Build the app for production:
+
+```bash
+npm run build
+```
