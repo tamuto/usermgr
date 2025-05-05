@@ -8,30 +8,46 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-
-// Create Virtual Routes
-
-const AboutLazyImport = createFileRoute('/about')()
-const IndexLazyImport = createFileRoute('/')()
+import { Route as UsersImport } from './routes/users'
+import { Route as SettingsImport } from './routes/settings'
+import { Route as GroupsImport } from './routes/groups'
+import { Route as IndexImport } from './routes/index'
+import { Route as UsersCreateImport } from './routes/users.create'
 
 // Create/Update Routes
 
-const AboutLazyRoute = AboutLazyImport.update({
-  id: '/about',
-  path: '/about',
+const UsersRoute = UsersImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+} as any)
 
-const IndexLazyRoute = IndexLazyImport.update({
+const SettingsRoute = SettingsImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GroupsRoute = GroupsImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
+
+const UsersCreateRoute = UsersCreateImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => UsersRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -41,54 +57,98 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+      preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutLazyImport
+    '/groups': {
+      id: '/groups'
+      path: '/groups'
+      fullPath: '/groups'
+      preLoaderRoute: typeof GroupsImport
       parentRoute: typeof rootRoute
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsImport
+      parentRoute: typeof rootRoute
+    }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersImport
+      parentRoute: typeof rootRoute
+    }
+    '/users/create': {
+      id: '/users/create'
+      path: '/create'
+      fullPath: '/users/create'
+      preLoaderRoute: typeof UsersCreateImport
+      parentRoute: typeof UsersImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface UsersRouteChildren {
+  UsersCreateRoute: typeof UsersCreateRoute
+}
+
+const UsersRouteChildren: UsersRouteChildren = {
+  UsersCreateRoute: UsersCreateRoute,
+}
+
+const UsersRouteWithChildren = UsersRoute._addFileChildren(UsersRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '/': typeof IndexRoute
+  '/groups': typeof GroupsRoute
+  '/settings': typeof SettingsRoute
+  '/users': typeof UsersRouteWithChildren
+  '/users/create': typeof UsersCreateRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '/': typeof IndexRoute
+  '/groups': typeof GroupsRoute
+  '/settings': typeof SettingsRoute
+  '/users': typeof UsersRouteWithChildren
+  '/users/create': typeof UsersCreateRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '/': typeof IndexRoute
+  '/groups': typeof GroupsRoute
+  '/settings': typeof SettingsRoute
+  '/users': typeof UsersRouteWithChildren
+  '/users/create': typeof UsersCreateRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/groups' | '/settings' | '/users' | '/users/create'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/groups' | '/settings' | '/users' | '/users/create'
+  id: '__root__' | '/' | '/groups' | '/settings' | '/users' | '/users/create'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  AboutLazyRoute: typeof AboutLazyRoute
+  IndexRoute: typeof IndexRoute
+  GroupsRoute: typeof GroupsRoute
+  SettingsRoute: typeof SettingsRoute
+  UsersRoute: typeof UsersRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  AboutLazyRoute: AboutLazyRoute,
+  IndexRoute: IndexRoute,
+  GroupsRoute: GroupsRoute,
+  SettingsRoute: SettingsRoute,
+  UsersRoute: UsersRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -102,14 +162,29 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about"
+        "/groups",
+        "/settings",
+        "/users"
       ]
     },
     "/": {
-      "filePath": "index.lazy.tsx"
+      "filePath": "index.tsx"
     },
-    "/about": {
-      "filePath": "about.lazy.tsx"
+    "/groups": {
+      "filePath": "groups.tsx"
+    },
+    "/settings": {
+      "filePath": "settings.tsx"
+    },
+    "/users": {
+      "filePath": "users.tsx",
+      "children": [
+        "/users/create"
+      ]
+    },
+    "/users/create": {
+      "filePath": "users.create.tsx",
+      "parent": "/users"
     }
   }
 }
