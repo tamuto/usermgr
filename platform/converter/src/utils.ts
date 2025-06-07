@@ -36,7 +36,7 @@ export const convertToRgbaHex = (color: string): string => {
  * @param value 解決する値
  * @returns 解決された値
  */
-export const resolveCssVar = (cssVars: CssVariables, value: string): string => {
+export const resolveCssVar = (cssVars: Record<string, string>, value: string): string => {
 	// CSS変数の参照かどうかをチェック
 	if (value?.startsWith("var(")) {
 		// var(--color-primary)形式から変数名を抽出
@@ -49,9 +49,9 @@ export const resolveCssVar = (cssVars: CssVariables, value: string): string => {
 			const fallback = varName[2];
 
 			// 変数が存在すればその値を返す
-			if (cssVars[variableName]) {
+			if (variableName in cssVars) {
 				// 値がさらに変数を参照している可能性があるため再帰的に解決
-				return resolveCssVar(cssVars, cssVars[variableName]);
+				return resolveCssVar(cssVars, cssVars[variableName] as string);
 			}
 			if (fallback) {
 				// フォールバック値があればそれを返す

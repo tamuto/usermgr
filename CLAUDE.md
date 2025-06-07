@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Comprehensive AWS Cognito user management system supporting multiple network environments:
 
 - **library/**: Core Python library with dual provider support (direct API + Lambda proxy)
-- **platform/**: Infrastructure (Terraform), Lambda functions, and UI converter
+- **platform/**: Infrastructure (Terraform), Lambda functions, and Cognito branding converter
 - **testui/**: React test interface with AWS Amplify integration
 - **tools/**: Administrative web interface (React + TanStack Router)
 
@@ -62,6 +62,16 @@ dotenv run ./usermgr/scripts/update_function.sh
 dotenv run ./download_jwks/scripts/update_function.sh
 ```
 
+### Cognito Branding Converter (from platform/converter/)
+```bash
+pnpm install       # Install dependencies
+pnpm build         # Build TypeScript to JavaScript
+pnpm start         # Run converter tool
+
+# Convert shadcn/ui CSS to Cognito branding
+npx cognito-convert --input globals.css --output cognito-branding.tf
+```
+
 ### Terraform Infrastructure (from platform/terraform/)
 ```bash
 terraform init
@@ -76,12 +86,23 @@ terraform apply
 - **Providers**: 
   - `cognito.py` - Direct AWS API (boto3, IPv6 compatible)
   - `lambda.py` - Lambda proxy for isolated environments
-- **Factory**: `usermgr/Factory.py` - Provider selection and singleton management
+- **Factory**: `usermgr/Factory.py` - Provider selection, singleton management, and instance creation
 
-### Known Issues to Fix
-- **Factory.py**: `create()` method not implemented (use `get_instance()`)
-- **Terraform**: Typos in variable names (`callback_ur_ls` → `callback_urls`)
-- **Tests**: All skipped due to missing environment configuration
+### Cognito Branding Converter
+- **Purpose**: Convert shadcn/ui CSS variables to AWS Cognito Managed Login branding format
+- **Input**: shadcn/ui `globals.css` with CSS custom properties
+- **Output**: Terraform `awscc_cognito_managed_login_branding` resource
+- **Features**:
+  - OKLCH to HEX color conversion
+  - Light/Dark mode support
+  - Button, form, focus, and status styling
+  - Automatic Terraform resource generation
+
+### Status Update (Latest)
+- **Factory.py**: ✅ `create()` method fully implemented and working
+- **Terraform**: Variable names `callback_ur_ls`/`logout_ur_ls` are correct (awscc provider syntax)
+- **Tests**: Environment-dependent tests available with proper setup
+- **Converter**: ✅ Full implementation with minor TypeScript fixes applied
 
 ### Provider Selection Logic
 ```python
@@ -115,30 +136,30 @@ LAMBDA_FUNCTION_NAME=usermgr
 
 ### Component Status
 
-**Complete (95%)**:
-- Core library functionality
-- Provider implementations  
-- Lambda functions and deployment scripts
-- Basic React UIs
+**Complete (95%+)**:
+- ✅ Core library functionality (Factory.py fully implemented)
+- ✅ Provider implementations (Cognito + Lambda)
+- ✅ Lambda functions and deployment scripts
+- ✅ Cognito branding converter (shadcn/ui → AWS Cognito branding)
+- ✅ Test UI with AWS Amplify integration
+- ✅ Environment-based testing framework
 
-**Needs Attention**:
-- Factory.py create() method implementation
-- Terraform variable name corrections
-- Test environment setup
-- Tools administrative functionality
-- Platform converter setup (missing package.json)
+**Partially Complete (40-90%)**:
+- 🔄 Administrative tools UI (user list ✅, forms pending)
+- 🔄 Terraform configurations (functional, minor optimizations possible)
 
 **Development Priorities**:
-1. Fix Factory.py and Terraform typos (immediate)
-2. Complete test environment setup
-3. Implement administrative tools functionality
-4. Finalize platform converter tool
+1. Complete tools/ administrative interface (user create/edit forms, group management)
+2. Enhance converter with additional CSS framework support
+3. Add comprehensive integration tests
+4. Documentation improvements for converter usage
 
 ### UI Architecture Notes
-- **testui/**: Full AWS Amplify integration, ready for Cognito auth testing
-- **tools/**: TanStack Router foundation, needs user management implementation
-- **React Pattern**: Both use modern React with TypeScript, Tailwind CSS
-- **Build System**: Rsbuild for both projects
+- **testui/**: Full AWS Amplify integration with Japanese localization, ready for Cognito auth testing
+- **tools/**: Advanced admin interface with TanStack Router, Zustand state management, user list complete
+- **converter/**: CLI tool with TypeScript, supports OKLCH color conversion and Terraform generation
+- **React Pattern**: Modern React with TypeScript, Tailwind CSS, shadcn/ui components
+- **Build System**: Rsbuild for UIs, standard TypeScript compilation for converter
 
 ### Security Considerations
 - HMAC secret hash generation for Cognito operations
