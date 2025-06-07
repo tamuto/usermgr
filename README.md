@@ -2,25 +2,46 @@
 
 ## Overview
 
-This is a library and tools for user management.
-It provides the following functions:
+This is a comprehensive library and tools suite for AWS Cognito user management, designed to handle various network environments and security requirements.
 
-- Python library (usermgr) for user management
-- Lambda functions for AWS Cognito user management
-- Terraform configurations for AWS Cognito setup
-- Web-based test UI for user management
-- Command-line tools for user management
+The project provides the following components:
+
+- **Python library (usermgr)** - Core user management library with provider pattern
+- **Lambda functions** - AWS Cognito operations via serverless functions
+- **Terraform configurations** - Infrastructure as Code for AWS Cognito setup
+- **Web-based test UI** - React application for testing user management
+- **Administrative tools** - Web-based management interface
+- **UI converter** - Tool for converting shadcn/ui to AWS Cognito branding
+
+## Network Environment Support
+
+This project supports multiple network configurations:
+
+### 1. **IPv6 + EGRESS_ONLY_INETGW (Recommended)**
+- **Direct Cognito API access** via IPv6 connectivity
+- Lower latency and cost compared to Lambda proxy
+- Suitable for modern AWS environments with IPv6 support
+
+### 2. **Lambda Proxy (Legacy/High Security)**
+- **Lambda-mediated operations** for complete network isolation
+- Required for private subnets without direct internet access
+- Ideal for high-security environments with strict external communication restrictions
+
+### 3. **Hybrid Approach**
+- Runtime switching between direct API and Lambda proxy
+- Configurable via environment variables or factory parameters
 
 ## Description of each tool and library
 
 ### usermgr library
 
-- This is a Python library for user management.
-- It provides functions such as adding, updating, deleting, and searching users, as well as group management.
-- At the moment, it supports AWS Cognito.
-- It supports both direct operation of Cognito API and operation via Lambda function.
-  - Use a Lambda function when you cannot directly operate Cognito from a private subnet.
-- In the future, it is planned to support other user management services. The structure of the library is designed with an abstract base class so that different providers can be implemented with the same interface.
+- Python library providing unified interface for AWS Cognito user management
+- Supports comprehensive user and group operations (CRUD, password management, etc.)
+- **Provider pattern architecture** with abstract base class for extensibility
+- **Dual access modes**:
+  - **Direct API**: Direct AWS Cognito API calls (IPv6 compatible)
+  - **Lambda Proxy**: Operations via Lambda functions for isolated environments
+- Environment-based configuration with singleton pattern support
 
 #### Install
 
@@ -39,47 +60,49 @@ pip install usermgr[lambda]
 #### Usage
 
 ```python
-from usermgr import Factory
+from usermgr.Factory import Factory
 
-# For direct Cognito operation
-instance = Factory.create(Factory.AWS_COGNITO, 
-                         region='<AWS_REGION>', 
-                         user_pool_id='<USER_POOL_ID>', 
-                         client_id='<CLIENT_ID>', 
-                         client_secret='<CLIENT_SECRET>')
+# Option 1: Environment-based singleton (recommended)
+um = Factory.get_usermgr()  # Uses AWS_COGNITO env var to determine provider
 
-# For Lambda operation
-instance = Factory.create(Factory.AWS_LAMBDA, 
-                         function_name='<LAMBDA_FUNCTION_NAME>')
+# Option 2: Direct Cognito operation (IPv6 environments)
+instance = Factory.get_instance(Factory.AWS_COGNITO, 
+                               region='<AWS_REGION>', 
+                               user_pool_id='<USER_POOL_ID>', 
+                               client_id='<CLIENT_ID>', 
+                               client_secret='<CLIENT_SECRET>')
 
-# Add a user
+# Option 3: Lambda operation (private subnets/high security)
+instance = Factory.get_instance(Factory.AWS_LAMBDA, 
+                               function_name='<LAMBDA_FUNCTION_NAME>')
+
+# User Management Operations
 instance.add_user('username', 'password', {
     'custom:extra_info': 'extra_info'
 })
 
-# Update user attributes
 instance.update_user('username', {
     'custom:extra_info': 'updated_info'
 })
 
-# Set a new password
 instance.set_password('username', 'new_password', permanent=True)
-
-# Delete a user
 instance.delete_user('username')
 
-# Check if a user exists
+# User Queries
 if instance.is_exist_user('username'):
     print('User exists')
 
-# Add a user to a group
-instance.add_user_to_group('username', 'groupname')
+user_info = instance.get_user('username')
+users_list = instance.list_users()
 
-# Create a new group
+# Group Management
 instance.add_group('groupname', 'description')
-
-# Delete a group
+instance.add_user_to_group('username', 'groupname')
+instance.remove_user_from_group('username', 'groupname')
 instance.delete_group('groupname')
+
+# Authentication Support
+instance.authenticate_user('username', 'password')
 ```
 
 - Please refer to `usermgr/base.py` for all available functions.
@@ -102,23 +125,23 @@ To use these configurations, navigate to the `platform/terraform` directory and 
 
 #### 1. Create an environment configuration file
 
-- Create the `platform/etc/.env` file.
-- The settings are as follows:
-  - AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_PROFILE should be set according to the aws cli configuration file.
+Create the `platform/etc/.env` file with the following settings:
 
-| Name | Description |
-| ---- | ----------- |
-| AWS_ACCESS_KEY_ID | Access key ID |
-| AWS_SECRET_ACCESS_KEY | Secret access key |
-| AWS_PROFILE | Profile name in the aws cli configuration file |
-| AWS_REGION | Region name |
-| ACCOUNT_ID | AWS account ID |
-| ROLE | IAM role name to be granted to the Lambda function |
-| LAMBDA_NAME_USERMGR| Lambda function name for user management |
-| LAMBDA_NAME_DOWNLOAD| Lambda function name for JWKS download |
-| USERPOOL_ID | Cognito user pool ID |
-| CLIENT_ID | Cognito client ID |
-| SECRET | Cognito client secret |
+| Name | Description | Example |
+| ---- | ----------- | ------- |
+| AWS_ACCESS_KEY_ID | AWS Access key ID (optional if using AWS Profile) | `AKIAIOSFODNN7EXAMPLE` |
+| AWS_SECRET_ACCESS_KEY | AWS Secret access key (optional if using AWS Profile) | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` |
+| AWS_PROFILE | AWS CLI profile name (recommended) | `default` |
+| AWS_REGION | AWS region | `ap-northeast-1` |
+| ACCOUNT_ID | AWS account ID | `123456789012` |
+| ROLE | IAM role name for Lambda functions | `usermgr-lambda-role` |
+| LAMBDA_NAME_USERMGR | Lambda function name for user management | `usermgr` |
+| LAMBDA_NAME_DOWNLOAD | Lambda function name for JWKS download | `usermgr_download_jwks` |
+| USERPOOL_ID | Cognito user pool ID | `ap-northeast-1_xxxxxxxxx` |
+| CLIENT_ID | Cognito client ID | `1234567890abcdefghijk` |
+| SECRET | Cognito client secret | `abcdefghijklmnop1234567890` |
+
+**Security Note**: Use AWS Profile or IAM roles instead of hardcoding access keys when possible.
 
 - Example (Modify as needed for your environment)
 
@@ -183,52 +206,107 @@ dotenv run ./download_jwks/scripts/execute_function.sh
 
 ### Web-based Test UI
 
-The repository includes a web-based test UI for user management in the `testui` directory. This UI is built using React and can be used to test user management functions.
+The `testui` directory contains a React-based test interface for user management operations. It provides:
 
-Setup:
+- AWS Amplify integration for Cognito authentication
+- Japanese language support
+- Sign-in/sign-out functionality
+- User management testing interface
+
+Setup and usage:
 
 ```bash
 cd testui
-npm install
+pnpm install    # Install dependencies
+pnpm dev        # Start development server (port 8080)
+pnpm build      # Production build
 ```
 
-Start the dev server:
+**Configuration**: Requires Cognito configuration in environment variables or config files.
 
-```bash
-npm run dev
-```
+### Administrative Tools
 
-Build for production:
+The `tools` directory provides a web-based administrative interface built with React and TanStack Router:
 
-```bash
-npm run build
-```
+- React-based management interface
+- Modern routing with TanStack Router
+- Administrative operations for user management
+- Environment configuration support
 
-### Command-line Tools
-
-The repository includes command-line tools for user management in the `tools` directory. These tools are built using Bun.
-
-Setup:
+Setup and usage:
 
 ```bash
 cd tools
-bun install
+pnpm install    # Install dependencies
+pnpm dev        # Start development server (port 8080)
+pnpm build      # Production build
 ```
 
-Run:
+**Note**: This tool is currently in development with basic routing structure in place.
+
+### UI Converter (platform/converter)
+
+Tool for converting shadcn/ui components to AWS Cognito Managed Login branding format:
+
+- Converts modern UI components to Cognito-compatible styling
+- Supports branding customization for Cognito hosted UI
+- Build artifacts available in `dist/` directory
+
+**Note**: This tool requires setup completion (package.json configuration needed).
+
+## Environment Configuration
+
+### Provider Selection
+
+The library automatically selects the appropriate provider based on environment variables:
 
 ```bash
-bun run index.ts
+# For direct Cognito API access (IPv6 environments)
+export AWS_COGNITO=true
+
+# For Lambda proxy access (private subnets)
+export AWS_LAMBDA=true
 ```
+
+### Testing Configuration
+
+For running tests, set up the following environment variables:
+
+```bash
+export AWS_REGION=ap-northeast-1
+export USERPOOL_ID=your_user_pool_id
+export CLIENT_ID=your_client_id
+export SECRET=your_client_secret
+export LAMBDA_FUNCTION_NAME=your_lambda_function_name
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Factory.create() not working**: Use `Factory.get_instance()` instead (see Usage section)
+2. **Tests skipped**: Configure environment variables as described above
+3. **IPv6 connectivity**: Ensure EGRESS_ONLY_INETGW is properly configured in your VPC
+4. **Lambda timeout**: Increase timeout settings for user management operations
 
 ## How To Remove the User Management Tools & Library
 
-- Follow the steps below after moving to the etc folder.
-- If you are referring to Lambda from Cognito, remove the Lambda trigger from Cognito before deleting the Lambda function.
-- Replace each name with the one specified in the environment settings.
+Follow these steps from the `platform/etc` directory:
 
-```bash
-dotenv run aws lambda delete-function --function-name usermgr
-dotenv run aws lambda delete-function --function-name usermgr_dl_jwks
-dotenv run aws iam delete-role --role-name usermgr-lambda-role
-```
+1. **Remove Lambda triggers** from Cognito (if any) before deleting functions
+2. **Delete Lambda functions**:
+   ```bash
+   dotenv run aws lambda delete-function --function-name usermgr
+   dotenv run aws lambda delete-function --function-name usermgr_download_jwks
+   ```
+3. **Delete IAM role**:
+   ```bash
+   dotenv run aws iam delete-role --role-name usermgr-lambda-role
+   ```
+4. **Clean up Terraform resources** (if used):
+   ```bash
+   cd platform/terraform
+   terraform destroy
+   ```
+
+Replace function and role names with those specified in your environment settings.
