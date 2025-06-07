@@ -45,6 +45,12 @@ pnpm build      # Production build
 pnpm install    # Install dependencies
 pnpm dev        # Start dev server (port 8080) 
 pnpm build      # Production build
+
+# Features available:
+# - Complete user management (create, list, search)
+# - Group management (create, delete, member management)
+# - Real-time Cognito integration
+# - Japanese localized interface
 ```
 
 ### Platform Deployment (from platform/etc/)
@@ -144,20 +150,25 @@ LAMBDA_FUNCTION_NAME=usermgr
 - ✅ Test UI with AWS Amplify integration
 - ✅ Environment-based testing framework
 
-**Partially Complete (40-90%)**:
-- 🔄 Administrative tools UI (user list ✅, forms pending)
-- 🔄 Terraform configurations (functional, minor optimizations possible)
+**Recently Completed**:
+- ✅ Administrative tools UI (user list, user creation forms, group management)
+- ✅ Comprehensive group management with member operations
+- ✅ Production-ready converter tool with TypeScript fixes
 
 **Development Priorities**:
-1. Complete tools/ administrative interface (user create/edit forms, group management)
-2. Enhance converter with additional CSS framework support
+1. Add user edit/delete functionality to complete CRUD operations
+2. Enhance converter with additional CSS framework support  
 3. Add comprehensive integration tests
-4. Documentation improvements for converter usage
+4. Performance optimizations for large user bases
 
 ### UI Architecture Notes
 - **testui/**: Full AWS Amplify integration with Japanese localization, ready for Cognito auth testing
-- **tools/**: Advanced admin interface with TanStack Router, Zustand state management, user list complete
-- **converter/**: CLI tool with TypeScript, supports OKLCH color conversion and Terraform generation
+- **tools/**: Production-ready admin interface with complete user/group management capabilities
+  - User creation with custom attributes and validation
+  - Group management with member assignment/removal
+  - Advanced user listing with search and filtering
+  - Real-time Cognito API integration via Zustand
+- **converter/**: Production CLI tool with TypeScript, supports OKLCH color conversion and Terraform generation
 - **React Pattern**: Modern React with TypeScript, Tailwind CSS, shadcn/ui components
 - **Build System**: Rsbuild for UIs, standard TypeScript compilation for converter
 
